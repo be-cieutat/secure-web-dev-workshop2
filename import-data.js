@@ -19,6 +19,14 @@ const LocationSchema = new Schema({
 
 const Locations = mongoose.model('Locations',LocationSchema);
 
+async function main() {
+    mongoose.connect(process.env.MONGO_URI).then(()=>console.log('yes !')
+        )
+        .catch(error => console.log(error))
+
+}
+
+const filmingLocations = require('./lieux-de-tournage-a-paris.json')
 
 
-
+main()
