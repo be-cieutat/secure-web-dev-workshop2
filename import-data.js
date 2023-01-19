@@ -1,32 +1,130 @@
+require('dotenv').config()
+
+//console.log(process.env.MONGO_URI);
 const mongoose = require('mongoose');
-require('dotenv').config();
-//console.log(process.env); //Debug for .env
 const { Schema } = mongoose;
 
-const LocationSchema = new Schema({
-    filmType: String, // String is shorthand for {type: String}
-    filmProducerName: String,
-    endDate: {type: Date},
-    filmName: String,
-    district: String,
-    geolocation: {coordinates : [Number],type :String},
-    sourceLocationId: String,
-    filmDirectorName: String,
-    address: String,
-    startDate: {type: Date},
-    year: Number,
+const schemaLocations = new Schema({
+        filmType:  String, // String is shorthand for {type: String}
+        filmProducerName: String,
+        endDate:   Date,
+        filmName: String,
+        District: String,
+        geolocation: {
+            type: String,
+            coordinates: [Number]
+        },
+        sourceLocationId: String,
+        filmDirectorName: String,
+        address: String,
+        startDate: Date,
+        year: Number,
+
+    },{typeKey: '$type'}
+);
+async function reponse(){
+    try {
+        const reponse1 = await Locations.findById("6333230099183ad74a0fd4fd");
+        console.log(reponse1);
+    }
+    catch (e){ console.log(e);}
+}
+const Locations = mongoose.model("Locations", schemaLocations);
+mongoose.connect(process.env.MONGO_URI)
+    .then(async () => {
+        console.log("[+] Connection is successfull");
+        /*
+        const filmingLocations = require('./lieux-de-tournage-a-paris.json');
+        const getFilmingArray = (filmingLocations) => {
+            let tab = [];
+            for (const element of filmingLocations) {
+                tab.push({
+                        "filmType": element.fields.type_tournage, // String is shorthand for {type: String}
+                        "filmProducerName": element.fields.nom_producteur,
+                        "endDate": element.fields.date_fin,
+                        "filmName": element.fields.nom_tournage,
+                        "District": element.fields.ardt_lieu,
+                        "geolocation": {
+                            "type": "Point",
+                            "coordinates": element.fields.geo_shape.coordinates
+                        },
+                        "sourceLocationId": element.fields.id_lieu,
+                        "filmDirectorName": element.fields.nom_realisateur,
+                        "address": element.fields.adresse_lieu,
+                        "startDate": element.fields.date_debut,
+                        "year": element.fields.annee_tournage,
+                    }
+                )
+            }
+            return tab;
+        }
+        const filmingArray = getFilmingArray(filmingLocations);
+        console.log(filmingArray.length);
+        //console.log(filmingArray[0]);
+        //populate(filmingArray);
+
+        */
+        //locationById(2019-1631)
+        //locationByName("LUZ")
+        deleteLocationById(2018-1274)
+        //await reponse();
+        mongoose.connection.close();
+    }).catch((e) => {
+    console.log("[-] No connection ");
+    console.error(e);
+
 });
+console.log(process.env.MONGO_URI);
 
-const Locations = mongoose.model('Locations',LocationSchema);
-
-async function main() {
-    mongoose.connect(process.env.MONGO_URI).then(()=>console.log('yes !')
-        )
-        .catch(error => console.log(error))
+async function populate(filmingArray){
+    try {
+        await Locations.insertMany(filmingArray);
+        console.log("Imported successfully.");
+    }
+    catch (e){console.log(e)}
 
 }
 
-const filmingLocations = require('./lieux-de-tournage-a-paris.json')
+async function locationById(id) {
+    try {
+        const response = await Locations.findOne({id:id});
+        console.log(response);
+    } catch (err) {
+        console.log("This location does not exist.");
+        console.log(err);
+    }
+}
 
+async function locationByName(filmName){
+    try {
+        const response = await Locations.find().where('filmName').equals(filmName);
+        console.log(response);
+    } catch (err) {
+        console.log("This location does not exist.");
+        console.log(err);
+    }
+}
 
-main()
+async function deleteLocationById(id) {
+    try {
+        await Locations.findOneAndDelete({id:id});
+        console.log("Successfully deleted the location.");
+    } catch (err) {
+        console.log("This location does not exist.");
+        console.log(err);
+    }
+}
+
+async function addLocation(location) {
+    try {
+        await Locations.create(location);
+        console.log("Added the location successfully");
+    } catch (err) {
+        console.log("An error occured");
+    }
+
+}
+
+//import mongoose from 'mongoose';
+
+//mongoose.connection.close();
